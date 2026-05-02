@@ -1,0 +1,108 @@
+-- GUI de controle de velocidade
+
+local player = game:GetService("Players").LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SpeedGUI"
+screenGui.Parent = game:GetService("CoreGui")
+
+-- Frame principal
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 250, 0, 120)
+frame.Position = UDim2.new(0.35, 0, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(40,40,40)
+frame.Parent = screenGui
+frame.Active = true
+frame.Draggable = true
+
+-- Barra de título
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1,0,0,30)
+titleBar.BackgroundColor3 = Color3.fromRGB(25,25,25)
+titleBar.Parent = frame
+
+-- Texto título
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,-30,1,0)
+title.Position = UDim2.new(0,5,0,0)
+title.BackgroundTransparency = 1
+title.Text = "Controle de Velocidade"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = titleBar
+
+-- Botão minimizar
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.new(0,30,1,0)
+minimize.Position = UDim2.new(1,-30,0,0)
+minimize.Text = "-"
+minimize.BackgroundColor3 = Color3.fromRGB(80,80,80)
+minimize.TextColor3 = Color3.new(1,1,1)
+minimize.Parent = titleBar
+
+-- Conteúdo
+local content = Instance.new("Frame")
+content.Size = UDim2.new(1,0,1,-30)
+content.Position = UDim2.new(0,0,0,30)
+content.BackgroundTransparency = 1
+content.Parent = frame
+
+-- Label velocidade
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1,0,0,30)
+label.BackgroundTransparency = 1
+label.TextColor3 = Color3.new(1,1,1)
+label.Text = "Velocidade: 16"
+label.Parent = content
+
+-- Caixa de input
+local box = Instance.new("TextBox")
+box.Size = UDim2.new(1,-20,0,30)
+box.Position = UDim2.new(0,10,0,40)
+box.Text = "16"
+box.BackgroundColor3 = Color3.fromRGB(60,60,60)
+box.TextColor3 = Color3.new(1,1,1)
+box.Parent = content
+
+-- Aplicar velocidade
+local function setSpeed(value)
+	local character = player.Character
+	if character and character:FindFirstChild("Humanoid") then
+		character.Humanoid.WalkSpeed = value
+	end
+end
+
+box.FocusLost:Connect(function()
+	local num = tonumber(box.Text)
+	if num then
+		label.Text = "Velocidade: "..num
+		setSpeed(num)
+	else
+		box.Text = "16"
+	end
+end)
+
+-- Minimizar / expandir
+local minimized = false
+
+minimize.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	
+	if minimized then
+		content.Visible = false
+		frame.Size = UDim2.new(0, 250, 0, 30)
+		minimize.Text = "+"
+	else
+		content.Visible = true
+		frame.Size = UDim2.new(0, 250, 0, 120)
+		minimize.Text = "-"
+	end
+end)
+
+-- Atualizar quando respawnar
+player.CharacterAdded:Connect(function(char)
+	wait(1)
+	local num = tonumber(box.Text)
+	if num then
+		setSpeed(num)
+	end
+end)
